@@ -15,11 +15,11 @@ import java.util.stream.Stream;
 
 public class Race {
 
-    private Logger log = Logger.getLogger(Race.class.getName());
-
     private static Random random = new Random();
 
     private final Set<Car> carsAtStart;
+    private final Logger log = Logger.getLogger(Race.class.getName());
+
     private Track track;
     private List<Car> carsOnWay;
 
@@ -28,7 +28,26 @@ public class Race {
         this.carsAtStart = carsAtStart;
     }
 
-    public void start() {
+    public static void main(String[] args) {
+        DirectTrack directTrack = new DirectTrack(1000);
+        int startPosition = directTrack.getStartPosition();
+        int finishPosition = directTrack.getFinishPosition();
+
+        Set<Car> racingCars = Stream.of(
+                new RacingCar(1, startPosition, finishPosition, 10),
+                new RacingCar(2, random.nextInt(directTrack.getFinishPosition()), finishPosition, 100),
+                new RacingCar(3, startPosition, finishPosition, 200),
+                new RacingCar(4, random.nextInt(directTrack.getFinishPosition()), finishPosition, 10),
+                new RacingCar(5, startPosition, finishPosition, 50),
+                new RacingCar(6, random.nextInt(directTrack.getFinishPosition()), finishPosition, 5),
+                new RacingCar(7, startPosition, finishPosition, 55)
+        ).collect(Collectors.toSet());
+
+        Race race = new Race(directTrack, racingCars);
+        race.start();
+    }
+
+    private void start() {
         log.info("Гонка началась!");
         carsOnWay = new ArrayList<>(carsAtStart);
         carsAtStart.clear();
@@ -56,31 +75,12 @@ public class Race {
                     .collect(Collectors.toList());
 
             if (!overtaking.isEmpty()) {
-                log.log(Level.INFO, "Автомобиль номер: {0} обогнал автомобили номер: {1}", new Object[]{lastDistance.getNumberCar(),  overtaking});
+                log.log(Level.INFO, "Автомобиль номер: {0} обогнал автомобили номер: {1}", new Object[]{lastDistance.getNumberCar(), overtaking});
             }
         });
     }
 
     private void finish() {
         log.info("Гонка закончилась!");
-    }
-
-    public static void main(String[] args) {
-        DirectTrack directTrack = new DirectTrack(1000);
-        int startPosition = directTrack.getStartPosition();
-        int finishPosition = directTrack.getFinishPosition();
-
-        Set<Car> racingCars = Stream.of(
-                new RacingCar(1, startPosition, finishPosition, 10),
-                new RacingCar(2, random.nextInt(directTrack.getFinishPosition()), finishPosition, 100),
-                new RacingCar(3, startPosition, finishPosition, 200),
-                new RacingCar(4, random.nextInt(directTrack.getFinishPosition()), finishPosition, 10),
-                new RacingCar(5, startPosition, finishPosition, 50),
-                new RacingCar(6, random.nextInt(directTrack.getFinishPosition()), finishPosition, 5),
-                new RacingCar(7, startPosition, finishPosition, 55)
-        ).collect(Collectors.toSet());
-
-        Race race = new Race(directTrack, racingCars);
-        race.start();
     }
 }
